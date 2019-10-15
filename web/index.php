@@ -1,0 +1,7 @@
+<?php
+
+require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/../lib/resourcedb/HomePage.php";
+
+$page = new HomePage($config);
+$page->show();
