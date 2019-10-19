@@ -8,19 +8,19 @@ class Page {
 	}
 	
 	public function authorize() {
-		if (!isset($_SESSION)) session_start();
-		if (!empty($_SESSION["user"])) {
+		if (empty($_SESSION)) session_start();
+		if (empty($_SESSION["username"])) {
 			header("Location: " . $this->getLoginUrl());
 		}
-	}		
+	}
 	
 	public function getDbh() {
 		$dbConfig = $this->config["database"];
 		$host = $dbConfig["host"];
 		$name = $dbConfig["name"];
-		$user = $dbConfig["user"];
-		$pass = $dbConfig["pass"];
-		$dbh = new PDO("mysql:host=$host;dbname=$name", $user, $pass);
+		$username = $dbConfig["username"];
+		$password = $dbConfig["password"];
+		$dbh = new PDO("mysql:host=$host;dbname=$name", $username, $password);
 		return $dbh;
 	}
 	

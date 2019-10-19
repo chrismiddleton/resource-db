@@ -8,54 +8,39 @@ class LoginResultPage extends Page {
 		parent::__construct($config);
 	}
 
-	public function attemptLogin($user, $pass) {
-		$sth = $this->dbh->query("SELECT hash FROM users WHERE username = :username");
+	public function attemptLogin(string $username, string $password): boolean {
+		$sth = $this->dbh->prepare("SELECT hash FROM users WHERE username = :username");
 		$sth->execute(array(':username' => $username));
 		$row = $sth->fetch();
 		$hash = $row["hash"];
 		if (password_verify($password, $hash)) {
-			$_SESSION["user"] = $user;
+			$_SESSION["username"] = $username;
 			return true;
 		} else {
 			return false;
 		}
 	}
 	
-	public function getTitle() {
+	public function getTitle(): string {
 		return "Login Result";
 	}
 	
-	public function renderBody() {
+	public function renderBody(): string {
 		// TODO: instead, go back to the login page
-		echo "<p>Login was unsuccessful.</p>";
+		return "<p>Login was unsuccessful.</p>";
 	}
 	
 	public function show() {
-		if (!isset($_SESSION)) session_start();
-		$user = $_POST["user"];
-		$pass = $_POST["pass"];
-		if ($this->attemptLogin($this->dbh, $user, $pass)) {
-			$dest = $_POST["dest"];
-			if (preg_match("/[\\n\\r]/", $dest)) {
-				$dest = "";
+		if (empty($_SESSION)) session_start();
+		$username = $_POST["username"];
+		$password = $_POST["password"];
+		if ($this->attemptLogin($username, $password)) {
+			$dest = trim($_POST["dest"]);
+			if (empty($dest) || preg_match("/[\\n\\r]/", $dest)) {
+				$dest = "index.php";
 			}
 			header("Location: $dest");
 		}
-	}
-	
-}
-		
-		
-
-require_once __DIR__ . "/config.php";
-require_once __DIR__ . "/lib/account/attemptLogin.php";
-
-$user = $_POST["user"];
-$pass = $_POST["pass"];
-
-$dbh = getDbh($config);
-
-$app->attemptLogin($dbh, $user, $pass);
 	}
 	
 }
